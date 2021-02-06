@@ -15,23 +15,23 @@ global {
 	bool weatherImpact <-true parameter: "Weather impact:" category: "Simulation";
 		
 	//ENVIRONMENT
-	float step <- 0.1 #mn;
-	date starting_date <- date([2021,2,4,0,0]);
+	float step <- 1 #sec;
+	date starting_date <- date([2021,2,4,8,0]);
 	string case_study <- "volpe" ;
 	int nb_people <- 500;   //11585;
 	
-    string cityGISFolder <- "./../../includes/City/"+case_study;
-	file<geometry> buildings_shapefile <- file<geometry>(cityGISFolder+"/Buildings.shp");
-	file<geometry> roads_shapefile <- file<geometry>(cityGISFolder+"/Roads.shp");
-	geometry shape <- envelope(roads_shapefile);
+    string cityGISFolder <- "./../includes/City/"+case_study;
+	file<geometry> buildings_shapefile <- file<geometry>("./../includes/City/volpe/Buildings.shp");
+	file<geometry> roads_shapefile <- file<geometry>("./../includes/City/volpe/Roads.shp");
+	
 	
 	// MOBILITY DATA
-	list<string> mobility_list <- ["walking", "bike","car","bus", "train"];
-	file activity_file <- file("./../../includes/Game_IT/ActivityPerProfile.csv");
-	file criteria_file <- file("./../../includes/Game_IT/CriteriaFile.csv");
-	file profile_file <- file("./../../includes/Game_IT/Profiles2.csv");
-	file mode_file <- file("./../../includes/Game_IT/Modes.csv");
-	file weather_coeff <- file("./../../includes/Game_IT/weather_coeff_per_month.csv");
+	list<string> mobility_list <- ["walking", "bike","car","bus", "T"];
+	file activity_file <- file("./../includes/Criteria/ActivityPerProfile2.csv");
+	file criteria_file <- file("./../includes/Criteria/CriteriaFile2.csv");
+	file profile_file <- file("./../includes/Criteria/Profiles2.csv");
+	file mode_file <- file("./../includes/Criteria/Modes2.csv");
+	file weather_coeff <- file("./../includes/Criteria/weather_coeff_per_month.csv");
 	
 	map<string,rgb> color_per_category <- [ "Restaurant"::rgb("#2B6A89"), "Night"::rgb("#1B2D36"),"GP"::rgb("#244251"), "Cultural"::rgb("#2A7EA6"), "Shopping"::rgb("#1D223A"), "HS"::rgb("#FFFC2F"), "Uni"::rgb("#807F30"), "O"::rgb("#545425"), "R"::rgb("#222222"), "Park"::rgb("#24461F")];	
 	map<string,rgb> color_per_type <- [ "High School Student"::rgb("#FFFFB2"), "College student"::rgb("#FECC5C"),"Young professional"::rgb("#FD8D3C"),  "Mid-career workers"::rgb("#F03B20"), "Executives"::rgb("#BD0026"), "Home maker"::rgb("#0B5038"), "Retirees"::rgb("#8CAB13")];
@@ -66,9 +66,10 @@ global {
 	float weather_of_day min: 0.0 max: 1.0;	
 
 	// TRANSPORT FILES
-	file<geometry> tLines_shapefile <- file<geometry>("C:/Users/Usuario/Documents/MIT_Media_Lab/Gama/CS_Dynamic_Urban_Planning/includes/City/volpe/kendall_Tline.shp");
-	file<geometry> tStops_shapefile <- file<geometry>("C:/Users/Usuario/Documents/MIT_Media_Lab/Gama/CS_Dynamic_Urban_Planning/includes/City/volpe/kendall_TStops.shp");
-	file<geometry> bStops_shapefile <- file<geometry>("C:/Users/Usuario/Documents/MIT_Media_Lab/Gama/CS_Dynamic_Urban_Planning/includes/City/volpe/kendall_busStop.shp");
+	file<geometry> tLines_shapefile <- file<geometry>("./../includes/City/volpe/kendall_Tline.shp");
+	file<geometry> tStops_shapefile <- file<geometry>("./../includes/City/volpe/kendall_TStops.shp");
+	file<geometry> bStops_shapefile <- file<geometry>("./../includes/City/volpe/kendall_busStop.shp");
+	geometry shape <- envelope(tLines_shapefile);
 	
 	
 	init {
@@ -79,8 +80,9 @@ global {
 		do criteria_file_import;
 		do characteristic_file_import;
 		do import_weather_data;
-		do compute_graph;
 		do create_train_lines;
+		do compute_graph;
+		
 		
 		create bus_stop from: bStops_shapefile with: [route::int(read("ROUTE")), station_num::int(read("STOP_NUM"))]{
 			if (listBusRoutes contains route = false){
@@ -92,7 +94,7 @@ global {
 		create bus number: length(listBusRoutes) {
 			route  <- listBusRoutes[cont];
 			list<bus_stop> stops_list <- list(bus_stop where (each.route = route));
-			stops <- list(bus_stop) sort_by (each.station_num);
+			stops <- stops_list sort_by (each.station_num);
 			location <- first(stops).location;
 			stop_passengers <- map<bus_stop, list<people>>(stops collect(each::[]));
 			cont_station <- 0;
@@ -131,9 +133,9 @@ global {
 					cont_station <- 0;
 					ascending <- true;	 
 				}
-				if (line=nil) {
+			}
+			if (line=nil) {
 					do die;
-				}
 			}
 		}
 		
@@ -261,7 +263,7 @@ global {
 	
 	action create_train_lines {
 		create train_line from: tLines_shapefile with: [line::rgb(read("colorLine"))] {	
-			mobility_allowed <- ["train"];
+			mobility_allowed <- ["T"];
 			if(listTrainLines contains line = false) {
 				listTrainLines << line;
 			}
@@ -270,7 +272,7 @@ global {
 		
 	action compute_graph {
 		loop mobility_mode over: color_per_mobility.keys {
-			if(mobility_mode != "train"){
+			if(mobility_mode != "T"){
 				graph_per_mobility[mobility_mode] <- as_edge_graph(road where (mobility_mode in each.mobility_allowed)) use_cache false;
 			}
 			else{
@@ -313,7 +315,7 @@ species bus_stop {
 	int station_num;
 	
 	aspect c {
-		draw circle(20) color: empty(waiting_people)?#black:#blue border: #black depth:1;
+		draw circle(20) color: empty(waiting_people)?#blue:#blue border: #black depth:1;
 	}
 }
 
@@ -435,7 +437,7 @@ species train skills: [moving] {
 	
 	reflex r {
 		if (stop_time = 0){
-			do goto target: my_target.location on: graph_per_mobility_train[line] speed:speed_per_mobility["train"]*0.5;
+			do goto target: my_target.location on: graph_per_mobility_train[line] speed:speed_per_mobility["T"]*0.5;
 			int nb_passengers <- stop_passengers.values sum_of (length(each));
 		}
 		else{
@@ -612,12 +614,12 @@ species people skills: [moving]{
 			if (has_car) {possible_mobility_modes << "car";}
 			if (has_bike) {possible_mobility_modes << "bike";}
 			possible_mobility_modes << "bus";
-			possible_mobility_modes << "train";			
+			possible_mobility_modes << "T";			
 			do choose_mobility_mode;
 		}
 	}
 	
-	reflex move when: (my_current_objective != nil) and (mobility_mode != "bus") and (mobility_mode!="train") {
+	reflex move when: (my_current_objective != nil) and (mobility_mode != "bus") and (mobility_mode!="T") {
 		transport_type_distance[mobility_mode] <- transport_type_distance[mobility_mode] + speed/step;
 		if ((current_edge != nil) and (mobility_mode in ["car"])) {
 			road(current_edge).current_concentration <- max([0,road(current_edge).current_concentration - 1]);
@@ -663,7 +665,7 @@ species people skills: [moving]{
 		}
 	}	
 	
-	reflex move_train when: (my_current_objective != nil) and (mobility_mode = "train") {
+	reflex move_train when: (my_current_objective != nil) and (mobility_mode = "T") {
 		if (train_status = 0){
 			do goto target: closest_train_stop.location on: graph_per_mobility["walking"];
 			if(location = closest_train_stop.location) {
@@ -697,7 +699,7 @@ species people skills: [moving]{
 			else if (mobility_mode = "car") {
 				draw square(size*2)  color: color ;
 			}
-			else if (mobility_mode = "train") {
+			else if (mobility_mode = "T") {
 				draw circle(size) color:color;
 			}
 		}
@@ -808,7 +810,7 @@ experiment gameit type: gui {
                 }
 				y <- y + 30 #px;
                 draw "Mobility Mode" at: { 40#px, 600#px } color: text_color font: font("Helvetica", 20, #bold) perspective:false;
-                map<string,rgb> list_of_existing_mobility <- map<string,rgb>(["Walking"::#green,"Bike"::#yellow,"Car"::#red,"Bus"::#blue, "Train"::#orange]);
+                map<string,rgb> list_of_existing_mobility <- map<string,rgb>(["Walking"::#green,"Bike"::#yellow,"Car"::#red,"Bus"::#blue, "T"::#orange]);
                 y <- y + 30 #px;
                 
                 loop i from: 0 to: length(list_of_existing_mobility) -1 {    
