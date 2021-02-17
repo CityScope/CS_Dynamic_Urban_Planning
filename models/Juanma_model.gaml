@@ -15,7 +15,7 @@ global {
 	bool weatherImpact <-true parameter: "Weather impact:" category: "Simulation";
 		
 	//ENVIRONMENT
-	float step <- 1 #sec;
+	float step <- 10 #sec;
 	date starting_date <- date([2021,2,4,8,0]);
 	string case_study <- "volpe" ;
 	int nb_people <- 500;   //11585;
@@ -369,7 +369,7 @@ species bus skills: [moving] {
 			}
 			stop_passengers[my_target] <- [];
 			loop p over: my_target.waiting_people {
-				bus_stop b <- bus_stop with_min_of(each distance_to(p.my_current_objective.place.location));
+				bus_stop b <- bus_stop where (each.route = route) with_min_of(each distance_to(p.my_current_objective.place.location));
 				add p to: stop_passengers[b] ;
 			}
 			my_target.waiting_people <- [];						
