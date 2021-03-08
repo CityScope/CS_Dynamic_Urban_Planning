@@ -43,6 +43,7 @@ If you want to get the region-specific housing and mobility mode criteria, use t
 5. Set `population_file`. It is necessary to modify this file and adapt it to the available census data for each case:
 
 | Block group Id1 | Block group Id2 | Total amount of citizens | Amount of citizens of profile 0 | ... | Amount of citizens of profile i | Diversity (Shannon Weaver) | Normalized diversity |
+| --------------- | --------------- | ------------------------ | ------------------------------- | --- | ------------------------------- | -------------------------- | -------------------- |
 
 6. Set `real_Kendall_data_file`. This file identifies the amount of workers from the finer granulated area (base case: Kendall) that live in each census block group.
 
