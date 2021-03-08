@@ -66,7 +66,7 @@ In order to adapt this model to the desired area, follow these instructions:
 
 ### B.3. Training of the regressor model
 
-This is a python script that trains the Response Surfaces linked to the following outputs: (1) the percentage of people working and living in the selected area according to their profile and depending on the amount of housing area built and the financial stimuli offered, (2) the construction area --grid-- occupancy rate, (3) the distribution of differnte mobility modes usage, (4) the mean commuting time, and (5) the mean commuting distance.
+This is a python script that trains the Response Surfaces linked to the following outputs: (1) the percentage of people working and living in the selected area according to their profile and depending on the amount of housing area built and the financial stimuli offered, (2) the construction area --grid-- occupancy rate, (3) the distribution of different mobility modes usage, (4) the mean commuting time, and (5) the mean commuting distance.
 This allows to obtain the mentioned urban metrics real time. A k-neighbour regressor is deployed for this. 80% of the batch experiments will be used for training purposes, and 20% for testing. In order to be able to use this script for your specific use case, follow these instructions:
 
 1. Open the `predictingValues.py` script located in the `results` folder.
