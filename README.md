@@ -7,7 +7,7 @@ This ABM aims at characterizing citizens' behavioral patterns regarding their re
 
 ### A. Installation of GAMA
 
-1. Clone this repository (clicking on the green Clone or download button on this page - to manage your repo you can also install Github Desktop on your computer
+1. Clone this repository (clicking on the green Clone or download button on this page - to manage your repo you can also install Github Desktop on your computer)
 2. Download GAMA (compatible with GAMA 1.8) (https://gama-platform.github.io/download)
 3. Run GAMA
 4. Choose a new Workspace (this is a temporary folder used for computation)
