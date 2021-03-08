@@ -66,17 +66,17 @@ In order to adapt this model to the desired area, follow these instructions:
 
 ### B.3. Training of the regressor model
 
-This is a python script that trains the Response Surfaces linked to the following outputs: (1) the percentage of people working and living in the selected area according to their profile and depending on the amount of housing area built and the financial stimuli offered, (2) the construction area --grid-- occupancy rate, (3) the distribution of different mobility modes usage, (4) the mean commuting time, and (5) the mean commuting distance.
-This allows to obtain the mentioned urban metrics real time. A k-neighbour regressor is deployed for this. 80% of the batch experiments will be used for training purposes, and 20% for testing. In order to be able to use this script for your specific use case, follow these instructions:
+This is a python script that trains the Response Surfaces linked to the following outputs: (1) the percentage of people working and living in the selected area according to their profile and depending on the amount of housing area built and the financial stimuli offered, (2) the construction area --grid-- occupancy rate, (3) the distribution of different mobility modes usage, (4) the mean commuting time, (5) the mean commuting distance, and (6) construction site occupancy rate.
+It allows to obtain the mentioned urban metrics real time. A k-neighbour regressor is deployed for this. 80% of the batch experiments will be used for training purposes, and 20% for testing. In order to be able to deploy this script for your specific use case, follow these instructions:
 
 1. Open the `predictingValues.py` script located in the `results` folder.
-2. Change `nameFileIn` and include the file where the results of the batch experiments are collected. This .csv file should follow this structure (it is prepared for 8 citizen agent profiles and 5 mobility modes, minor changes to reduce/increase this values would be needed):
+2. Change `nameFileIn` and include the file where the results of the batch experiments are collected. This .csv file should follow this structure (it is prepared for 8 citizen agent profiles and 5 mobility modes, minor changes to reduce/increase these values would be needed):
 
-| Total proportion of workers living in the area of interest | Proportion of workers with profile 0 | ... | Proportion of workers with profile 7 | Usage of mobility mode 1 | ... | Usage of mobility mode 4 | Mean commuting time | Mean commuting distance |  Construction site occupancy |
+| Total proportion of workers living in the area of interest | Proportion of workers of profile 0 | ... | Proportion of workers of profile 7 | Usage of mobility mode 0 | ... | Usage of mobility mode 4 | Mean commuting time | Mean commuting distance |  Construction site occupancy |
 | ---------------------------------------------------------- | ------------------------------------ | --- | ------------------------------------ | ------------------------ | --- | ------------------------ | ------------------- | ----------------------- | ---------------------------- |
 
-3. Select `nameFileOut`. This file will gather the results obtained from the regressor.
-4. Select `nameStatFile` . This file includes the statistical results (mainly R^2 and RMSE values) of the regressor.
+3. Set `nameFileOut`. This file will gather the results obtained from the regressor.
+4. Set `nameStatFile` . This file includes the statistical results (mainly R^2 and RMSE values) of the regressor.
 
 
 ### B.4. CityScopable Model
@@ -84,11 +84,11 @@ This allows to obtain the mentioned urban metrics real time. A k-neighbour regre
 The results obtained from the regressor model will be used to feed the real-time model or "CityScopable" model. The aforementioned urban-metrics will define the t=0 scenario that can then be used to visualize how the commuting process can be altered thanks to the suggested urban disruptions and incentives. To adapt this model to your specific use case:
 
 1. Import the `buildings_shapefile`, `roads_shapefile`, `busStops_shapefile`, `TStops_shapefile` and `Tline_shapefile` just as you did in B.1. and B.2. This time these shapefiles will include only the area of interest (base case: Kendall) and not the surroundings (base case: Greater Boston Area).
-2. Set the `entry_point_shapefile`. This file should include the entry points to the selected area, either if they are road entry points or metro/train entry points. Attributes: `mobility` indicates the type of entry point (road or metro).
-3. Set the .csv files containing the results of the regressor. These could be the what-if scenarios that have been created for the calibrated case or for any hypothetical behavioral incentives that might have changed citizen agents' decision-making parameters.
+2. Set the `entry_point_shapefile`. This file should include the entry points to the selected area, both road entry points and metro/train entry points. Attributes: `mobility` indicates the type of entry point (road or metro).
+3. Set the .csv files containing the results of the regressor. These could be the what-if scenarios that have been created for the calibrated case or the files generated for any hypothetical behavioral incentive that might have changed citizens' decision-making parameters.
 4. Set `activity_file` with the daily schedule of each citizen profile.
 5. Set `originalProfiles` (equivalent to `profile_file` in B.1.) and `mode_file` just as you did for B.1.
 
-You are now ready to run the CityScopable gui and easily visualize citizen agents' reactions to potential urban disruptions and housing-related incentives.
+You are now ready to run the CityScopable GUI and easily visualize citizens' reactions to potential urban disruptions and housing-related incentives.
  
 
