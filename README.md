@@ -48,6 +48,7 @@ If you want to get the region-specific housing and mobility mode criteria, use t
 6. Set `real_Kendall_data_file`. This file identifies the amount of workers from the finer granulated area (base case: Kendall) that live in each census block group.
 
 |Block Group id2 | Number of workers living there | Profile |
+| -------------- | ------------------------------ | ------- |
 
 7. Set `real_mobility_data_file`. Distribution of usage for each transportation mode available in the area of interest.
 
